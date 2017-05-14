@@ -40,13 +40,9 @@ public abstract class LazyStream<E> implements Stream<E> {
 	final Iterator<E> iterator = iterator();
 	int count = 0;
 	while (iterator.hasNext()) {
-	    final E temp = iterator.next();
-	    System.out.println(temp);
-	    System.out.println(iterator.hasNext());
-	    System.out.println("---");
+	    iterator.next();
 	    count++;
 	}
-	System.out.println("Count: " + count);
 	return count;
     }
 
@@ -64,14 +60,18 @@ public abstract class LazyStream<E> implements Stream<E> {
 
     @Override
     public E get(int index) throws IndexOutOfBoundsException {
+	final Iterator<E> iterator = iterator();
 	if (index < 0) {
 	    throw new IllegalArgumentException();
+	} else if (!iterator.hasNext()) {
+	    throw new IndexOutOfBoundsException();
 	}
-	final Iterator<E> iterator = iterator();
 	for (int n = 0; n < index; n++) {
 	    iterator.next();
 	}
-	return iterator.next();
+	final E temp = iterator.next();
+	System.out.println(index + " : " + temp);
+	return temp;
     }
 
     @Override
@@ -148,8 +148,8 @@ public abstract class LazyStream<E> implements Stream<E> {
 	if (n < 0) {
 	    throw new IllegalArgumentException();
 	}
-	final Iterator<E> iterator = iterator();
 	int index = 0;
+	final Iterator<E> iterator = iterator();
 
 	while (index < n && iterator.hasNext()) {
 	    iterator.next();
@@ -170,10 +170,6 @@ public abstract class LazyStream<E> implements Stream<E> {
 
 	while (iterator.hasNext()) {
 	    final E temp = iterator.next();
-	    System.out.println(predicate.test(temp));
-	    System.out.println(temp);
-	    System.out.println("###");
-
 	    if (predicate.test(temp)) {
 		limitedList.add(temp);
 	    }
