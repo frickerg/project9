@@ -63,14 +63,13 @@ public abstract class LazyStream<E> implements Stream<E> {
 	final Iterator<E> iterator = iterator();
 	if (index < 0) {
 	    throw new IllegalArgumentException();
-	} else if (!iterator.hasNext()) {
-	    throw new IndexOutOfBoundsException();
 	}
 	for (int n = 0; n < index; n++) {
-	    iterator.next();
+	    if (iterator.hasNext()) {
+		iterator.next();
+	    }
 	}
 	final E temp = iterator.next();
-	System.out.println(index + " : " + temp);
 	return temp;
     }
 
@@ -154,6 +153,9 @@ public abstract class LazyStream<E> implements Stream<E> {
 	while (index < n && iterator.hasNext()) {
 	    iterator.next();
 	    index++;
+	    if (!iterator.hasNext()) {
+		index = 0;
+	    }
 	}
 	return new LazyStream<E>() {
 	    @Override

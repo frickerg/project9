@@ -30,6 +30,7 @@ public class SeededStream<E> extends LazyStream<E> {
 
     @Override
     public Iterator<E> iterator() {
+	this.currentSeed = this.seed;
 	return new Iterator<E>() {
 	    final int limiter = 1024;
 	    int index = 0;
@@ -37,11 +38,12 @@ public class SeededStream<E> extends LazyStream<E> {
 	    @Override
 	    public boolean hasNext() {
 		final boolean hasNext = SeededStream.this.condition.test(SeededStream.this.currentSeed);
+		System.out.println(hasNext + " : " + SeededStream.this.currentSeed);
 		if (!hasNext || this.index >= this.limiter) {
 		    SeededStream.this.currentSeed = SeededStream.this.seed;
 		    return false;
 		}
-		return true;
+		return hasNext;
 	    }
 
 	    @Override
