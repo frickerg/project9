@@ -6,7 +6,6 @@ import project9.interfaces.Mapping;
 import project9.interfaces.Predicate;
 
 public class SeededStream<E> extends LazyStream<E> {
-
     private final E seed;
     private E currentSeed;
     private final Mapping<E, E> update;
@@ -32,15 +31,13 @@ public class SeededStream<E> extends LazyStream<E> {
     public Iterator<E> iterator() {
 	this.currentSeed = this.seed;
 	return new Iterator<E>() {
-	    final int limiter = 1024;
+	    int limiter = 1024;
 	    int index = 0;
 
 	    @Override
 	    public boolean hasNext() {
 		final boolean hasNext = SeededStream.this.condition.test(SeededStream.this.currentSeed);
-		System.out.println(hasNext + " : " + SeededStream.this.currentSeed);
 		if (!hasNext || this.index >= this.limiter) {
-		    SeededStream.this.currentSeed = SeededStream.this.seed;
 		    return false;
 		}
 		return hasNext;
@@ -48,13 +45,9 @@ public class SeededStream<E> extends LazyStream<E> {
 
 	    @Override
 	    public E next() {
-		this.index++;
 		final E temp = SeededStream.this.currentSeed;
-		if (this.index >= this.limiter) {
-		    return SeededStream.this.currentSeed = SeededStream.this.seed;
-		} else {
-		    SeededStream.this.currentSeed = SeededStream.this.update.apply(SeededStream.this.currentSeed);
-		}
+		SeededStream.this.currentSeed = SeededStream.this.update.apply(SeededStream.this.currentSeed);
+		this.index++;
 		return temp;
 	    }
 	};

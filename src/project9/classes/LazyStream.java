@@ -65,12 +65,9 @@ public abstract class LazyStream<E> implements Stream<E> {
 	    throw new IllegalArgumentException();
 	}
 	for (int n = 0; n < index; n++) {
-	    if (iterator.hasNext()) {
-		iterator.next();
-	    }
+	    iterator.next();
 	}
-	final E temp = iterator.next();
-	return temp;
+	return iterator.next();
     }
 
     @Override
