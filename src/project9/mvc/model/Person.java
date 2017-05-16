@@ -1,64 +1,63 @@
 package project9.mvc.model;
 
+import java.io.Serializable;
 import java.util.Calendar;
+import java.util.Properties;;
 
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
+public class Person implements Serializable {
 
-public class Person {
-
-    private final SimpleIntegerProperty id;
-    private final SimpleStringProperty name, surname, date, gender, drugName;
+    private static final long serialVersionUID = 1L;
+    private final Properties properties = new Properties();
 
     public Person(Integer id, String name, String surname, String date, String gender, String drugName) {
-	this.id = new SimpleIntegerProperty(id);
-	this.name = new SimpleStringProperty(name);
-	this.surname = new SimpleStringProperty(surname);
-	this.date = new SimpleStringProperty(date);
-	this.gender = new SimpleStringProperty(gender);
-	this.drugName = new SimpleStringProperty(drugName);
+	this.properties.put("id", id.toString());
+	this.properties.put("name", name);
+	this.properties.put("surname", surname);
+	this.properties.put("date", date);
+	this.properties.put("gender", gender);
+	this.properties.put("drugName", drugName);
     }
 
     /**
      * @return the id
      */
     public Integer getId() {
-	return this.id.get();
+	return Integer.valueOf(this.properties.getProperty("id"));
     }
 
     /**
      * @return the name
      */
     public String getName() {
-	return this.name.get();
+	return this.properties.getProperty("name");
     }
 
     /**
      * @return the surname
      */
     public String getSurname() {
-	return this.surname.get();
+	return this.properties.getProperty("surname");
     }
 
     /**
      * @return the date
      */
     public String getDate() {
-	return getAge() + "";
+	return Double.valueOf(getAge()).toString();
     }
 
     /**
      * @return the gender
      */
     public String getGender() {
-	return this.gender.get();
+	return this.properties.getProperty("gender");
     }
 
     /**
      * @return the drugName
      */
     public String getDrugName() {
-	return this.drugName.get();
+	return this.properties.getProperty("drugName");
     }
 
     /*
@@ -68,18 +67,18 @@ public class Person {
      */
     @Override
     public String toString() {
-	return this.name.get() + " " + this.surname.get();
+	return this.properties.toString();
     }
 
     public String getFullname() {
-	return this.name.get() + " " + this.surname.get();
+	return this.properties.getProperty("name") + " " + this.properties.get("surname");
     }
 
     /**
      * @return the age
      */
     public double getAge() {
-	final String date[] = this.date.get().split("/");
+	final String date[] = this.properties.get("date").toString().split("/");
 	final int born = Integer.parseInt(date[2]);
 	return Calendar.getInstance().get(Calendar.YEAR) - born;
     }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Observable;
 
 import project9.classes.ArrayStream;
+import project9.interfaces.Predicate;
 
 public class Search extends Observable {
 
@@ -91,8 +92,25 @@ public class Search extends Observable {
     }
 
     public Person find(String text) {
-	final Person person = this.streamList.find(p -> p.getFullname().equals(text));
+	final String formattedText = text.toLowerCase();
+	Person person = null;
+	for (int i = 0; i <= 6 || person == null; i++) {
+	    person = this.streamList.find(getNextAlgorithm(6, formattedText));
+	}
 	return person;
+
+    }
+
+    private Predicate<Person> getNextAlgorithm(int index, String formattedText) {
+	final List<Predicate<Person>> conditionArray = new ArrayList<Predicate<Person>>();
+	conditionArray.add(p -> p.getSurname().equalsIgnoreCase(formattedText));
+	conditionArray.add(p -> p.getFullname().toLowerCase().contains(formattedText));
+	conditionArray.add(p -> p.getSurname().toLowerCase().contains(formattedText));
+	conditionArray.add(p -> p.getName().equalsIgnoreCase(formattedText));
+	conditionArray.add(p -> p.getName().toLowerCase().contains(formattedText));
+	conditionArray.add(p -> p.getFullname().equalsIgnoreCase(formattedText));
+	conditionArray.add(p -> p.getFullname().toLowerCase().contains(formattedText));
+	return conditionArray.get(index);
     }
 
 }
