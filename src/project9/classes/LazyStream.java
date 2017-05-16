@@ -10,13 +10,11 @@ import project9.interfaces.Predicate;
 import project9.interfaces.Stream;
 
 public abstract class LazyStream<E> implements Stream<E> {
-
     @Override
     public boolean matchAll(Predicate<? super E> predicate) {
 	final Iterator<E> iterator = iterator();
 	while (iterator.hasNext()) {
-	    final E element = iterator.next();
-	    if (!predicate.test(element)) {
+	    if (!predicate.test(iterator.next())) {
 		return false;
 	    }
 	}
@@ -27,8 +25,7 @@ public abstract class LazyStream<E> implements Stream<E> {
     public boolean matchAny(Predicate<? super E> predicate) {
 	final Iterator<E> iterator = iterator();
 	while (iterator.hasNext()) {
-	    final E element = iterator.next();
-	    if (predicate.test(element)) {
+	    if (predicate.test(iterator.next())) {
 		return true;
 	    }
 	}
@@ -37,8 +34,8 @@ public abstract class LazyStream<E> implements Stream<E> {
 
     @Override
     public int countAll() {
-	final Iterator<E> iterator = iterator();
 	int count = 0;
+	final Iterator<E> iterator = iterator();
 	while (iterator.hasNext()) {
 	    iterator.next();
 	    count++;
@@ -48,8 +45,8 @@ public abstract class LazyStream<E> implements Stream<E> {
 
     @Override
     public int count(Predicate<? super E> predicate) {
-	final Iterator<E> iterator = iterator();
 	int count = 0;
+	final Iterator<E> iterator = iterator();
 	while (iterator.hasNext()) {
 	    if (predicate.test(iterator.next())) {
 		count++;
@@ -60,23 +57,28 @@ public abstract class LazyStream<E> implements Stream<E> {
 
     @Override
     public E get(int index) throws IndexOutOfBoundsException {
-	final Iterator<E> iterator = iterator();
 	if (index < 0) {
-	    throw new IllegalArgumentException();
+	    throw new IndexOutOfBoundsException();
 	}
-	for (int n = 0; n < index; n++) {
+	int count = 0;
+	final Iterator<E> iterator = iterator();
+	while (iterator.hasNext()) {
+	    if (count == index) {
+		return iterator.next();
+	    }
 	    iterator.next();
+	    count++;
 	}
-	return iterator.next();
+	throw new IndexOutOfBoundsException();
     }
 
     @Override
     public E find(Predicate<? super E> predicate) {
 	final Iterator<E> iterator = iterator();
 	while (iterator.hasNext()) {
-	    final E current = iterator.next();
-	    if (predicate.test(current)) {
-		return current;
+	    final E e = iterator.next();
+	    if (predicate.test(e)) {
+		return e;
 	    }
 	}
 	return null;
@@ -85,25 +87,21 @@ public abstract class LazyStream<E> implements Stream<E> {
     @Override
     public E reduce(Operator<E> operator) {
 	final Iterator<E> iterator = iterator();
-	if (!iterator.hasNext()) {
-	    return null;
+	if (iterator.hasNext()) {
+	    E value = iterator.next();
+	    while (iterator.hasNext()) {
+		value = operator.apply(value, iterator.next());
+	    }
+	    return value;
 	}
+	return null;
 
-	E temp = iterator.next();
-	E result = temp;
-
-	while (iterator.hasNext()) {
-	    result = operator.apply(temp, iterator.next());
-	    temp = result;
-	}
-
-	return result;
     }
 
     @Override
     public List<E> toList() {
+	final List<E> list = new ArrayList<>();
 	final Iterator<E> iterator = iterator();
-	final List<E> list = new ArrayList<E>();
 	while (iterator.hasNext()) {
 	    list.add(iterator.next());
 	}
@@ -122,17 +120,17 @@ public abstract class LazyStream<E> implements Stream<E> {
 	    @Override
 	    public Iterator<E> iterator() {
 		return new Iterator<E>() {
-		    Iterator<E> it = source.iterator();
+		    Iterator<E> iterator = source.iterator();
 
 		    @Override
 		    public boolean hasNext() {
-			return count < n && this.it.hasNext();
+			return count < n && this.iterator.hasNext();
 		    }
 
 		    @Override
 		    public E next() {
 			count++;
-			return this.it.next();
+			return this.iterator.next();
 		    }
 		};
 	    }
@@ -144,50 +142,66 @@ public abstract class LazyStream<E> implements Stream<E> {
 	if (n < 0) {
 	    throw new IllegalArgumentException();
 	}
-	int index = 0;
-	final Iterator<E> iterator = iterator();
 
-	while (index < n && iterator.hasNext()) {
-	    iterator.next();
-	    index++;
-	    if (!iterator.hasNext()) {
-		index = 0;
-	    }
-	}
+	final Stream<E> source = this;
+
 	return new LazyStream<E>() {
+
+	    private int count = 0;
+
 	    @Override
 	    public Iterator<E> iterator() {
-		return iterator;
+		return new Iterator<E>() {
+
+		    private final Iterator<E> iterator = source.iterator();
+
+		    @Override
+		    public boolean hasNext() {
+			while (count < n && this.iterator.hasNext()) {
+			    this.iterator.next();
+			    count++;
+			}
+			return this.iterator.hasNext();
+
+		    }
+
+		    @Override
+		    public E next() {
+			return this.iterator.next();
+		    }
+
+		};
 	    }
 	};
     }
 
     @Override
     public Stream<E> filter(Predicate<? super E> predicate) {
-	final Iterator<E> iterator = iterator();
-	final List<E> limitedList = new ArrayList<E>();
-
-	while (iterator.hasNext()) {
-	    final E temp = iterator.next();
-	    if (predicate.test(temp)) {
-		limitedList.add(temp);
-	    }
-	}
+	final Stream<E> source = this;
 
 	return new LazyStream<E>() {
+
 	    @Override
 	    public Iterator<E> iterator() {
 		return new Iterator<E>() {
-		    private int index = 0;
+
+		    private final Iterator<E> iterator = source.iterator();
+		    private E element;
 
 		    @Override
 		    public boolean hasNext() {
-			return this.index < limitedList.size();
+			while (this.iterator.hasNext()) {
+			    this.element = this.iterator.next();
+			    if (predicate.test(this.element)) {
+				return true;
+			    }
+			}
+			return false;
 		    }
 
 		    @Override
 		    public E next() {
-			return limitedList.get(this.index++);
+			return this.element;
 		    }
 		};
 	    }
@@ -196,32 +210,26 @@ public abstract class LazyStream<E> implements Stream<E> {
 
     @Override
     public <F> Stream<F> map(Mapping<? super E, ? extends F> mapping) {
-	final Iterator<E> iterator = iterator();
-	final List<F> limitedList = new ArrayList<F>();
-
-	while (iterator.hasNext()) {
-	    final F temp = mapping.apply(iterator.next());
-	    limitedList.add(temp);
-	}
+	final Stream<E> source = this;
 	return new LazyStream<F>() {
+
 	    @Override
 	    public Iterator<F> iterator() {
 		return new Iterator<F>() {
-		    private int index = 0;
+
+		    private final Iterator<E> iterator = source.iterator();
 
 		    @Override
 		    public boolean hasNext() {
-			return this.index < limitedList.size();
+			return this.iterator.hasNext();
 		    }
 
 		    @Override
 		    public F next() {
-			return limitedList.get(this.index++);
+			return mapping.apply(this.iterator.next());
 		    }
 		};
 	    }
 	};
-
     }
-
 }
