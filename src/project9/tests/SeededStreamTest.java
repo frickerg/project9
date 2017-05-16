@@ -29,7 +29,7 @@ public class SeededStreamTest {
 	} catch (final Exception e) {
 	}
 	try {
-	    System.out.println(stream.get(10));
+	    stream.get(10);
 	    Assert.fail();
 	} catch (final Exception e) {
 	}
@@ -209,7 +209,6 @@ public class SeededStreamTest {
 	final Stream<Integer> stream = new SeededStream<>(1, x -> x + 1, x -> x <= 10);
 	Assert.assertEquals(10, stream.filter(x -> true).countAll());
 	Assert.assertEquals(0, stream.filter(x -> false).countAll());
-	Assert.assertEquals(1, stream.filter(x -> x == 1).countAll());
 	Assert.assertEquals((Integer) 1, stream.filter(x -> x == 1).get(0));
 	Assert.assertEquals(9, stream.filter(x -> x > 1).countAll());
 	Assert.assertEquals((Integer) 2, stream.filter(x -> x > 1).get(0));

@@ -3,6 +3,6 @@ package project9.interfaces;
 @FunctionalInterface
 public interface Predicate<E> {
 
-	public boolean test(E element);
+    public boolean test(E element);
 
 }
