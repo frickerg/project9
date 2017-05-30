@@ -25,7 +25,7 @@ public abstract class DataHandler {
 	    data = deserializeData();
 	} else {
 	    System.out.println("The data of " + DataHandler.SOURCE + " has not been serialized yet");
-	    data = createData();
+	    data = readExcelData();
 	    serializeData(data);
 	}
 	for (final Person entity : data) {
@@ -66,7 +66,7 @@ public abstract class DataHandler {
 	}
     }
 
-    private static List<Person> createData() {
+    private static List<Person> readExcelData() {
 	System.out.println("Creating data List from source " + DataHandler.SOURCE);
 	final List<Person> data = new ArrayList<Person>();
 	try (Scanner scan = new Scanner(new File(DataHandler.SOURCE));) {

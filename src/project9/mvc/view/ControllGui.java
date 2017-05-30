@@ -23,8 +23,9 @@ public class ControllGui extends Stage {
     public ControllGui(Controller controller) {
 	this.controller = controller;
 
-	this.setScene(new Scene(this.root, 350, 300));
-
+	this.setScene(new Scene(this.root, 400, 400));
+	this.setX(200);
+	this.setY(700);
 	intialise();
     }
 

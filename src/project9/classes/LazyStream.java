@@ -35,8 +35,9 @@ public abstract class LazyStream<E> implements Stream<E> {
 
     @Override
     public int countAll() {
-	int count = 0;
 	final Iterator<E> it = iterator();
+
+	int count = 0;
 	while (it.hasNext()) {
 	    it.next();
 	    count++;
@@ -46,8 +47,9 @@ public abstract class LazyStream<E> implements Stream<E> {
 
     @Override
     public int count(Predicate<? super E> predicate) {
-	int count = 0;
 	final Iterator<E> it = iterator();
+
+	int count = 0;
 	while (it.hasNext()) {
 	    if (predicate.test(it.next())) {
 		count++;
@@ -61,8 +63,10 @@ public abstract class LazyStream<E> implements Stream<E> {
 	if (index < 0) {
 	    throw new IndexOutOfBoundsException();
 	}
-	int count = 0;
+
 	final Iterator<E> it = iterator();
+
+	int count = 0;
 	while (it.hasNext()) {
 	    if (count == index) {
 		return it.next();

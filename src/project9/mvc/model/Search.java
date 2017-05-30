@@ -94,8 +94,8 @@ public class Search extends Observable {
     public Person find(String text) {
 	final String formattedText = text.toLowerCase();
 	Person person = null;
-	for (int i = 0; i <= 6 || person == null; i++) {
-	    person = this.streamList.find(getNextAlgorithm(6, formattedText));
+	for (int i = 0; i < 6 || person == null; i++) {
+	    person = this.streamList.find(getNextAlgorithm(i, formattedText));
 	}
 	return person;
 
@@ -104,7 +104,6 @@ public class Search extends Observable {
     private Predicate<Person> getNextAlgorithm(int index, String formattedText) {
 	final List<Predicate<Person>> conditionArray = new ArrayList<Predicate<Person>>();
 	conditionArray.add(p -> p.getSurname().equalsIgnoreCase(formattedText));
-	conditionArray.add(p -> p.getFullname().toLowerCase().contains(formattedText));
 	conditionArray.add(p -> p.getSurname().toLowerCase().contains(formattedText));
 	conditionArray.add(p -> p.getName().equalsIgnoreCase(formattedText));
 	conditionArray.add(p -> p.getName().toLowerCase().contains(formattedText));

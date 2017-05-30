@@ -6,15 +6,10 @@ import project9.interfaces.Mapping;
 import project9.interfaces.Predicate;
 
 public class SeededStream<E> extends LazyStream<E> {
-    private final E seed;
     private E currentSeed;
+    private Predicate<E> condition;
+    private final E seed;
     private final Mapping<E, E> update;
-    private Predicate<E> condition = new Predicate<E>() {
-	@Override
-	public boolean test(E element) {
-	    return true;
-	}
-    };
 
     public SeededStream(E seed, Mapping<E, E> update) {
 	this.seed = seed;
@@ -30,14 +25,14 @@ public class SeededStream<E> extends LazyStream<E> {
     @Override
     public Iterator<E> iterator() {
 	this.currentSeed = this.seed;
+
 	return new Iterator<E>() {
 	    @Override
 	    public boolean hasNext() {
-		final boolean hasNext = SeededStream.this.condition.test(SeededStream.this.currentSeed);
-		if (!hasNext) {
-		    return false;
+		if (SeededStream.this.condition == null) {
+		    return true;
 		}
-		return hasNext;
+		return SeededStream.this.condition.test(SeededStream.this.currentSeed);
 	    }
 
 	    @Override
