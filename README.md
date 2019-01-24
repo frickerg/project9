@@ -33,7 +33,7 @@ Note that the return type of map(Mapping<? super E, ? extends F> mapping) is a s
 b) Write a class ArrayStream<E>, which inherits from LazyStream<E>. Its purpose is to construct a stream from an array, which is called "source" of the stream. Write a constructor
 
 ```
-	public ArrayStream(E... array)
+public ArrayStream(E... array)
 ```
 
 and the method Iterator<E> iterator().
@@ -43,8 +43,8 @@ c) Write a class SeededStream<E>, which inherits from LazyStream<E>. Its purpose
 There are two types of such streams. The first type has an infinite number of elements, whereas the second type contains only elements satisfying a given condition (as soon as an element not satisfying the condition is generated, the stream ends). Write corresponding constructors
 
 ```
-	public SeededStream(E seed, Mapping<E, E> update)
-	public SeededStream(E seed, Mapping<E, E> update, Predicate<E> condition)
+public SeededStream(E seed, Mapping<E, E> update)
+public SeededStream(E seed, Mapping<E, E> update, Predicate<E> condition)
 ```
 
 and the method Iterator<E> iterator().
